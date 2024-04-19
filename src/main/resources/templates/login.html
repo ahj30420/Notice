@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Page</title>
+    <style>
+        .error-message {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <h2>Login Page</h2>
+    <form action="/api/member/login" method="post" th:object="${loginDto}">
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" id="name" th:field="*{name}">
+            <div th:if="${#fields.hasErrors('name')}" class="error-message" th:errors="*{name}"></div>
+        </div>
+        <div>
+            <label for="pw">Password:</label>
+            <input type="password" id="pw" th:field="*{pw}">
+            <div th:if="${#fields.hasErrors('pw')}" class="error-message" th:errors="*{pw}"></div>
+        </div>
+        <button type="submit">Login</button>
+    </form>
+    <div th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></div>
+</div>
+</body>
+</html>

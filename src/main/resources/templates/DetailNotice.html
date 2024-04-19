@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>공지사항 상세 정보</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .info {
+            margin-bottom: 20px;
+        }
+        .info label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .attachments {
+            margin-top: 20px;
+        }
+        .attachments ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .attachments ul li {
+            margin-bottom: 10px;
+        }
+        .attachments ul li a {
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+        .attachments ul li a:hover {
+            text-decoration: underline;
+        }
+        /* 수정 및 삭제 버튼 스타일링 */
+        .btn-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .btn-container button {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin-right: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .btn-container button:hover {
+            background-color: #45a049;
+        }
+        .btn-container form {
+            display: inline-block;
+        }
+    </style>
+</head>
+<div class="container">
+    <h2>공지사항 상세 정보</h2>
+    <div class="info">
+        <label>제목:</label> <span th:text="${notice.title}"></span><br>
+        <label>내용:</label> <span th:text="${notice.content}"></span><br>
+        <label>작성일시:</label> <span th:text="${#temporals.format(notice.createdDateTime, 'yyyy-MM-dd HH:mm')}"></span><br>
+        <label>조회수:</label> <span th:text="${notice.viewCount}"></span><br>
+        <label>작성자:</label> <span th:text="${notice.memberDto.name}"></span><br>
+    </div>
+
+    <!-- 첨부 파일 목록 표시 -->
+    <div class="attachments">
+        <h3>첨부 파일</h3>
+        <ul>
+            <li th:each="file : ${files}">
+                <a th:href="@{/api/attachFile/downloadFile/{fileId}(fileId=${file.id})}">
+                    <u th:text="${file.realFileName}"></u>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- 작성자에게만 표시될 버튼 -->
+    <div class="btn-container" th:if="${permissions}">
+        <form th:action="@{/api/notice/info/{noticeId}(noticeId=${notice.id})}" method="get">
+            <button type="submit">수정</button>
+        </form>
+        <form th:action="@{/api/notice/{noticeId}(noticeId=${notice.id})}" method="post">
+            <input type="hidden" name="_method" value="delete">
+            <button type="submit">삭제</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

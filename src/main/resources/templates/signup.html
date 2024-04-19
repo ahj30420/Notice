@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Signup Page</title>
+    <style>
+        .error-message {
+            color: red;
+        }
+        .radio-label {
+            display: inline-block;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <h2>Signup Page</h2>
+    <form action="/api/member/signup" method="post" th:object="${joinDto}">
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" id="name" th:field="*{name}">
+            <div th:if="${#fields.hasErrors('name')}" class="error-message" th:errors="*{name}"></div>
+        </div>
+        <div>
+            <label for="pw">Password:</label>
+            <input type="password" id="pw" th:field="*{pw}">
+            <div th:if="${#fields.hasErrors('pw')}" class="error-message" th:errors="*{pw}"></div>
+        </div>
+        <div>
+            <label>사용자 유형:</label><br>
+            <label class="radio-label">
+                <input type="radio" id="user" name="role" value="USER" checked>
+                사용자
+            </label>
+            <label class="radio-label">
+                <input type="radio" id="admin" name="role" value="ADMIN">
+                관리자
+            </label>
+        </div>
+        <button type="submit">Signup</button>
+    </form>
+    <div th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></div>
+</div>
+</body>
+</html>

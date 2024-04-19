@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>공지사항 수정</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .form-group input[type="text"],
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .form-group input[type="datetime-local"] {
+            width: calc(100% - 22px); /* Subtract padding and border width */
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .btn-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .btn-container button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin-right: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .btn-container button:hover {
+            background-color: #45a049;
+        }
+        .file-list {
+            margin-top: 20px;
+        }
+        .file-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .file-list ul li {
+            margin-bottom: 10px;
+        }
+        .file-list ul li span {
+            margin-right: 10px;
+        }
+        .file-list ul li button {
+            background-color: #f44336;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 12px;
+            margin-right: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .file-list ul li button:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>공지사항 수정</h2>
+    <form th:action="@{/api/notice/{id}(id=${notice.id})}" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="_method" value="patch">
+        <div class="form-group">
+            <label for="id">번호:</label>
+            <input type="text" id="id" name="id" th:value="${notice.id}" disabled>
+        </div>
+        <div class="form-group">
+            <label for="title">제목:</label>
+            <input type="text" id="title" name="title" th:value="${notice.title}" required>
+        </div>
+        <div class="form-group">
+            <label for="content">내용:</label>
+            <textarea id="content" name="content" rows="5" required th:text="${notice.content}"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="startDateTime">시작일시:</label>
+            <input type="datetime-local" id="startDateTime" name="startDateTime" th:value="${#temporals.format(notice.startDateTime, 'yyyy-MM-dd HH:mm')}" required>
+        </div>
+        <div class="form-group">
+            <label for="endDateTime">종료일시:</label>
+            <input type="datetime-local" id="endDateTime" name="endDateTime" th:value="${#temporals.format(notice.endDateTime, 'yyyy-MM-dd HH:mm')}" required>
+        </div>
+        <div class="form-group">
+            <label for="endDateTime">등록일시:</label>
+            <input type="datetime-local" id="createdDateTime" name="createdDateTime" th:value="${#temporals.format(notice.createdDateTime, 'yyyy-MM-dd HH:mm')}" disabled>
+        </div>
+        <div class="form-group">
+            <label for="id">조회수:</label>
+            <input type="text" id="viewCount" name="viewCount" th:value="${notice.viewCount}" disabled>
+        </div>
+        <div class="form-group">
+            <label for="id">작성자:</label>
+            <input type="text" id="name" name="name" th:value="${notice.memberDto.name}" disabled>
+        </div>
+        <label for="files">첨부 파일:</label>
+        <input type="file" id="files" name="multipartFiles" multiple>
+        <!-- 수정 버튼 -->
+        <div class="btn-container">
+            <button type="submit">수정</button>
+        </div>
+    </form>
+
+    <!-- 등록된 첨부 파일 목록 -->
+    <div class="file-list">
+        <h3>첨부 파일 목록</h3>
+        <ul>
+            <li th:each="file : ${files}">
+                <u th:text="${file.realFileName}"></u>
+                <button onclick="deleteFile(this.getAttribute('data-notice-id'), this.getAttribute('data-file-id'), this.getAttribute('data-store-file-name'))"
+                        th:data-notice-id="${notice.id}" th:data-file-id="${file.id}" th:data-store-file-name="${file.storeFileName}">삭제</button>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    function deleteFile(noticeId, fileId, storeFileName) {
+        if (confirm("정말로 이 파일을 삭제하시겠습니까?")) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("delete", `/api/attachFile/${noticeId}/${fileId}?storeFileName=${storeFileName}`, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        console.log("파일 삭제됨:", fileId);
+                        window.location.reload(); // 파일이 삭제된 후 페이지를 새로고침합니다.
+                    } else {
+                        console.error('파일 삭제 실패:', xhr.status);
+                    }
+                }
+            };
+            xhr.send();
+        }
+    }
+</script>
+</body>
+</html>

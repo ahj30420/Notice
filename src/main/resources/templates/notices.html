@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>전체 공지사항</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            position: relative; /* 부모 요소를 상대적 위치로 설정 */
+        }
+        h2 {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .table-container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative; /* 자식 요소를 절대적으로 위치시키기 위해 부모 요소를 상대적 위치로 설정 */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #f2f2f2;
+        }
+        td a {
+            text-decoration: none;
+            color: #333;
+        }
+        td a:hover {
+            text-decoration: underline;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            text-align: center;
+        }
+        ul li {
+            display: inline-block;
+            margin: 0 5px;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        ul li:hover {
+            background-color: #f2f2f2;
+        }
+        /* 버튼 위치 설정 */
+        .register-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="register-button">
+    <button th:if="${permissions}" onclick="location.href='/registerNotice'" style="padding: 5px; margin-right: 170px;">공지사항 등록</button>
+</div>
+
+<h2>전체 공지사항</h2>
+<div class="table-container">
+    <table>
+        <thead>
+        <tr>
+            <th>번호</th>
+            <th>제목</th>
+            <th>작성자</th>
+            <th>작성일시</th>
+            <th>조회수</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- 공지사항 목록을 반복해서 표시합니다. -->
+        <tr th:each="notice, iterStat : ${noticeList}">
+            <td th:text="${iterStat.count}"></td>
+            <td><u><a th:href="@{/api/notice/detail/{noticeId}(noticeId=${notice.id})}" th:text="${notice.title}"></a></u></td>
+            <td th:text="${notice.memberDto.name}"></td>
+            <td th:text="${#temporals.format(notice.createdDateTime, 'yyyy-MM-dd HH:mm')}"></td>
+            <td th:text="${notice.viewCount}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- 페이징 처리를 위한 링크를 표시합니다. -->
+<div>
+    <ul>
+        <li th:each="pageNumber : ${#numbers.sequence(0, totalCount - 1)}">
+            <a th:href="@{/api/notice/all(page=${pageNumber})}" th:text="${pageNumber + 1}"></a>
+        </li>
+    </ul>
+</div>
+</body>
+</html>
