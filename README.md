@@ -85,6 +85,7 @@
 - **Interceptor**를 통해 관리자만 공지사항에 대한 관리 권한을 갖도록 설계하였습니다.<br><br>
 
 [코드확인](https://github.com/ahj30420/Notice/blob/master/src/main/java/project/notice/interceptor/AdminCheckInterceptor.java)
+![Interceptor](https://github.com/ahj30420/Notice/assets/79964990/1e8ab35a-6423-452a-a334-ddedae57f39d)
 <hr>
 
 ### RESTfull API 설계
